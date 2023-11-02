@@ -3,7 +3,8 @@ import React from "react"
 export default function Meme() {
     const [meme, setMeme] = React.useState({
         topText: "",
-        bottomText: ""
+        bottomText: "",
+        randomImage: "http://i.imgflip.com/1bij.jpg" 
     })
 
     function handleChange(event) {
@@ -12,6 +13,24 @@ export default function Meme() {
             ...prevMeme,
             [name]: value
         }))
+    }
+
+    const [allMemes, setAllMemes] = React.useState([])
+    
+    React.useEffect(() => {
+        fetch("https://api.imgflip.com/get_memes")
+            .then(res => res.json())
+            .then(data => setAllMemes(data.data.memes))
+    }, [])
+    
+    function getMemeImage() {
+        const randomNumber = Math.floor(Math.random() * allMemes.length)
+        const url = allMemes[randomNumber].url
+        setMeme(prevMeme => ({
+            ...prevMeme,
+            randomImage: url
+        }))
+        
     }
 
     return (
@@ -35,12 +54,13 @@ export default function Meme() {
                 />
                 <button 
                     className="form--button"
+                    onClick={getMemeImage}
                 >
                     Get a new meme image 🖼️
                 </button>
             </div>
             <div className="meme">
-                <img src="http://i.imgflip.com/1bij.jpg"className="meme--image" />
+                <img src={meme.randomImage}className="meme--image" />
                 <h2 className="meme--text top">{meme.topText}</h2>
                 <h2 className="meme--text bottom">{meme.bottomText}</h2>
             </div>
